@@ -6,7 +6,6 @@
       body {
         font: 10px sans-serif;
       }
-
       .graph_container {
         position: relative;
         margin: 0 auto;
@@ -18,18 +17,15 @@
         stroke-width: 1px;
         fill: none;
       }
-
       .axis path,
       .axis line {
         fill: none;
         stroke: #000;
         shape-rendering: crispEdges;
       }
-
       .area {
         fill: black;
       }
-
       #graph_container_1 .area {
         fill: royalblue;
       }
@@ -44,7 +40,7 @@
     
     // Determine graph size
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
-        width = 1500 - margin.left - margin.right, //Make chart wider here 
+        width = 1000 - margin.left - margin.right, //Make chart wider here 
         height = 500 - margin.top - margin.bottom;
     
     // Parse date
@@ -76,31 +72,42 @@
         .attr("height", height + margin.top + margin.bottom)
       .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    
-    d3.json("Rainfall_data_charlotte.json", function(error, data) {
-      console.log(data);
-      // Setup each row of data by formatting the Date for X, and by converting to a number for Y.
+        
+//*****************File reading and functions*******************************************  
+      d3.json("sample.json", function(error, data) {
+      //console.log(data);
+      
+      function averagewithoutdates(d){
+        //console.log(d);
+        for (var i=0; i<d.length; i++){
+          console.log(d[i]);
+          for(var j=0; j<d[i].length; j++){
+            //console.log(d[i][j]);
+          }
+        }
+      }
+     
       data.forEach(function(d) {
-        d.key = parseDate(String(d.Date));
-        d.value = +((d.CRN_01 + d.CRN_02 + d.CRN_03 + d.CRN_04 + d.CRN_05 + d.CRN_06 + d.CRN_07 + d.CRN_08 + d.CRN_09 + d.CRN_10 + d.CRN_11 + d.CRN_12 + d.CRN_13 + d.CRN_14 + d.CRN_15 + d.CRN_16 + d.CRN_17 + d.CRN_18 + d.CRN_19 + d.CRN_20 + d.CRN_21 + d.CRN_22 + d.CRN_23 + d.CRN_24 + d.CRN_25 + d.CRN_26 + d.CRN_27 + d.CRN_28 + d.CRN_29 + d.CRN_30 + d.CRN_31 + d.CRN_32 + d.CRN_33 + d.CRN_34 + d.CRN_35 + d.CRN_36 + d.CRN_37 + d.CRN_38 + d.CRN_39 + d.CRN_40 + d.CRN_41 + d.CRN_42 + d.CRN_43 + d.CRN_44 + d.CRN_45 + d.CRN_46 + d.CRN_47 + d.CRN_48 + d.CRN_49 + d.CRN_50 + d.CRN_51 + d.CRN_52 + d.CRN_53 + d.CRN_54 + d.CRN_55 + d.CRN_56 + d.CRN_57 + d.CRN_58 + d.CRN_59 + d.CRN_60 + d.CRN_61 + d.CRN_62 + d.CRN_63 + d.CRN_64 + d.CRN_65 + d.CRN_66 + d.CRN_67 + d.CRN_68 + d.CRN_69 + d.CRN_70 + d.CRN_71 + d.CRN_72)/72);
+        d.key = parseDate(String(d.Date)); //create a new entry d.key that holds parsed date 
+        d.value = averagewithoutdates(Object.entries(d)); //call function on an array of arrays
       });
+//****************************************************************************************
 
       x.domain(d3.extent(data, function(d) { return d.key; }));
       y.domain([0, d3.max(data, function(d) { return d.value; })]);
-
+      
       // Draw the raw data as an area; write averaging functions here
       graph1.append("path")
           .datum(data)
           .attr("class", "area")
           .attr("d", area);
-
+          
       // Draw x-axis
       graph1.append("g")
           .attr("class", "x axis")
           .attr("transform", "translate(0," + height + ")")
           .call(xAxis);
-
+          
       // Draw y-axis
       graph1.append("g")
           .attr("class", "y axis")

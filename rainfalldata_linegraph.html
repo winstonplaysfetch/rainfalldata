@@ -77,19 +77,33 @@
       d3.json("sample.json", function(error, data) {
       //console.log(data);
       
-      function averagewithoutdates(d){
-        //console.log(d);
-        for (var i=0; i<d.length; i++){
-          console.log(d[i]);
-          for(var j=0; j<d[i].length; j++){
-            //console.log(d[i][j]);
+      function calculateDayAverages(d){ //returns 1 avg of CRN readings per date
+        var filteredArray = [];
+        var avg=0;
+        for (var i=0; i<d.length; i++){ //traverse through arrays
+          d[i] = d[i].filter(isNumber);
+          for(var j=0; j<d[i].length; j++){ //traverse through an array in the arrays
+           filteredArray.push(d[i][j]);
           }
         }
+        var total=0;
+        for (var i=0;i<filteredArray.length;i++){
+          total+=filteredArray[i];
+        }
+        avg = total/filteredArray.length;
+        //console.log(filteredArray);
+        //console.log(avg);
+        return avg;
+      }
+      
+      function isNumber(obj){
+        return obj!== undefined && typeof(obj) === 'number' && !isNaN(obj);
       }
      
       data.forEach(function(d) {
-        d.key = parseDate(String(d.Date)); //create a new entry d.key that holds parsed date 
-        d.value = averagewithoutdates(Object.entries(d)); //call function on an array of arrays
+        d.key = parseDate(String(d.Date)); //create a new entry d.key that holds parsed date
+        console.log(d.key);
+        d.value = calculateDayAverages(Object.entries(d)); //call function on an array of arrays
       });
 //****************************************************************************************
 

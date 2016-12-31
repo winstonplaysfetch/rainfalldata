@@ -4,7 +4,7 @@
   <head>
     <style>
       body {
-        font: 10px sans-serif;
+        font: 12px sans-serif;
       }
       .graph_container {
         position: relative;
@@ -34,14 +34,14 @@
   </head>
   <body>
 
-  <div id="graph_container_1" class="graph_container"><p>Rainfall Data</p></div>
+  <div id="graph_container_1" class="graph_container"><h1>Rainfall Data</h1></div>
   <script src="http://d3js.org/d3.v3.min.js"></script>
   <script type="text/javascript" charset="utf-8">
     
     // Determine graph size
     var margin = {top: 20, right: 20, bottom: 30, left: 50},
         width = 1000 - margin.left - margin.right, //Make chart wider here 
-        height = 500 - margin.top - margin.bottom;
+        height = 400 - margin.top - margin.bottom;
     
     // Parse date
     var parseDate = d3.time.format("%m/%d/%Y").parse;
@@ -74,18 +74,12 @@
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         
 //*****************File reading and functions*******************************************  
-      d3.json("sample.json", function(error, data) {
+      d3.json("Rainfall_data_charlotte.json", function(error, data) {
       //console.log(data);
       
       function calculateDayAverages(d){ //returns 1 avg of CRN readings per date
-        var filteredArray = [];
+        filteredArray = filterArray(d);
         var avg=0;
-        for (var i=0; i<d.length; i++){ //traverse through arrays
-          d[i] = d[i].filter(isNumber);
-          for(var j=0; j<d[i].length; j++){ //traverse through an array in the arrays
-           filteredArray.push(d[i][j]);
-          }
-        }
         var total=0;
         for (var i=0;i<filteredArray.length;i++){
           total+=filteredArray[i];
@@ -96,13 +90,24 @@
         return avg;
       }
       
+      function filterArray(d){
+        var filteredArray = [];
+        for (var i=0; i<d.length; i++){ 
+          d[i] = d[i].filter(isNumber); // Apply filter for integers
+          for(var j=0; j<d[i].length; j++){ 
+           filteredArray.push(d[i][j]); // Add the remaining values in the inner arrays to an array
+          }
+        }
+        return filteredArray;
+      }
+      
       function isNumber(obj){
         return obj!== undefined && typeof(obj) === 'number' && !isNaN(obj);
       }
      
       data.forEach(function(d) {
         d.key = parseDate(String(d.Date)); //create a new entry d.key that holds parsed date
-        console.log(d.key);
+        //console.log(d.key);
         d.value = calculateDayAverages(Object.entries(d)); //call function on an array of arrays
       });
 //****************************************************************************************

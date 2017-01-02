@@ -13,7 +13,7 @@
       }
       
        path.average {
-        stroke: darkviolet;
+        stroke: black;
         stroke-width: 1px;
         fill: none;
       }
@@ -62,7 +62,7 @@
     
     // Setup SVG area fill displayed under a line of data.
     var area = d3.svg.area()
-        .x(function(d) { return x(d.key); })
+        .x(function(d) { return x(d.date); })
         .y0(height)
         .y1(function(d) { return y(d.value); });
     
@@ -77,23 +77,22 @@
       d3.json("Rainfall_data_charlotte.json", function(error, data) {
       //console.log(data);
       
-      function calculateDayAverages(d){ //returns 1 avg of CRN readings per date
-        filteredArray = filterArray(d);
+      function calculateAverages(d){ //calculates the average of values in an array
         var avg=0;
         var total=0;
-        for (var i=0;i<filteredArray.length;i++){
-          total+=filteredArray[i];
+        for (var i=0;i<d.length;i++){
+          total+=d[i];
         }
-        avg = total/filteredArray.length;
-        //console.log(filteredArray);
+        avg = total/d.length;
+        //console.log(d);
         //console.log(avg);
         return avg;
       }
       
-      function filterArray(d){
+      function filterArray(d){ //filters an array of arrays for numerical values, creates new array
         var filteredArray = [];
         for (var i=0; i<d.length; i++){ 
-          d[i] = d[i].filter(isNumber); // Apply filter for integers
+          d[i] = d[i].filter(isNumber); // Apply filter for numerical values
           for(var j=0; j<d[i].length; j++){ 
            filteredArray.push(d[i][j]); // Add the remaining values in the inner arrays to an array
           }
@@ -101,21 +100,47 @@
         return filteredArray;
       }
       
-      function isNumber(obj){
+      function isNumber(obj){ //determine if a value is a number (eg. not a date or null)
         return obj!== undefined && typeof(obj) === 'number' && !isNaN(obj);
       }
      
       data.forEach(function(d) {
-        d.key = parseDate(String(d.Date)); //create a new entry d.key that holds parsed date
-        //console.log(d.key);
-        d.value = calculateDayAverages(Object.entries(d)); //call function on an array of arrays
+        d.date = parseDate(String(d.Date)); //create a new entry d.date that holds parsed date
+        //console.log(d.date);
+        d.prevalue = filterArray(Object.entries(d)); //returns a single array from array of arrays
+        d.value = calculateAverages(d.prevalue); //returns 1 avg of CRN readings per date
       });
-//****************************************************************************************
 
-      x.domain(d3.extent(data, function(d) { return d.key; }));
+      x.domain(d3.extent(data, function(d) { return d.date; }));
       y.domain([0, d3.max(data, function(d) { return d.value; })]);
-      
-      // Draw the raw data as an area; write averaging functions here
+/*      
+//******************************Average Line********************************************
+      var month = 0;
+      var total = 0;
+      var averageLine = d3.svg.line()
+      .x(function(d,i) { return x(d.date); })
+      .y(function(d,i) { 
+         if (i % 30 !== 0){
+           month += y(d.value);
+           total = month;
+         } else if (i % 30 == 0){
+           total = month/30;
+           month = 0;
+         }
+         console.log(i);
+         console.log(total);
+         return total;
+      })
+      .interpolate("linear"); //monotone
+
+//*************************************************************************************      
+     
+      // Draw average line
+      graph1.append("path")
+        .attr("class", "average")
+        .attr("d", averageLine(data));
+*/      
+      // Draw raw data area
       graph1.append("path")
           .datum(data)
           .attr("class", "area")
